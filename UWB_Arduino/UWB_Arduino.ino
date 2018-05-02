@@ -32,7 +32,12 @@ int32_t anchors_x[num_anchors] = {100, 750, 6750, 7450};               // anchor
 int32_t anchors_y[num_anchors] = {100, 8300, 10200, 100};                  // anchor y-coordinates in mm
 int32_t heights[num_anchors] = {2000, 1680, 2300, 1460};              // anchor z-coordinates in mm
 
-uint8_t algorithm =  POZYX_POS_ALG_UWB_ONLY  ;             // positioning algorithm to use. try  POZYX_POS_ALG_TRACKING for fast moving objects. POZYX_POS_ALG_UWB_ONLY
+  //Nodige variabelen om een filtering in te schakelen
+uint8_t filter_type = FILTER_TYPE_MOVINGMEDIAN;                //Klassiek signaal filteren (keuze uit low pass FIR filter, moving average and moving median) 
+uint8_t filter_strength = 8;                                   //Filter strengt van minimaal 3 nemen (hoe hoger hoe trager je coordinaten verkrijgt)
+
+  //Nodige variabelen om het position algoritme vast te leggen
+uint8_t algorithm =  POZYX_POS_ALG_TRACKING  ;             // positioning algorithm to use. try  POZYX_POS_ALG_TRACKING for fast moving objects. POZYX_POS_ALG_UWB_ONLY
 uint8_t dimension = POZYX_3D;                           // positioning dimension
 int32_t height = 800;                                  // height of device, required in 2.5D positioning
 ///VariabelenCanBus//////////////////////////////////////////////////////////////////////////
@@ -74,6 +79,8 @@ void setup(){
     Pozyx.clearDevices(remote_id);
     // sets the anchor manually
     setAnchorsManual();
+    //Filter instellen voor de UWB coördinaten
+    Pozyx.setPositionFilter(filter_type,filter_strength,remote_id);
     // sets the positioning algorithm
     Pozyx.setPositionAlgorithm(algorithm, dimension, remote_id);
 
