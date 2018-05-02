@@ -33,10 +33,10 @@ byte Encoder_lock = 0;
 byte BNO_lock = 0;
 
 ///RCcontrol//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int motor = 5;                                //Pin 9 UNO voor PWM aandrijfmotor (aandrijving)
-int servoMotor = 6;                          //Pin 10 UNO voor PWM servomotor (sturen)
+int motor = 3;                                //Pin 9 UNO voor PWM aandrijfmotor (aandrijving)
+int servoMotor = 9;                          //Pin 10 UNO voor PWM servomotor (sturen)
 int32_t frequency = 100;                      //Frequentie (in Hz, we willen een PWM met een frequentie van 100 Hz
-float GewensteDutyCycle = 42.12;              //Dutycycle (38/255) = 15,06%, kan verhoogd worden als er meer apparatuur op het RC car platform geplaatst wordt, 42.12
+float GewensteDutyCycle = 42.4;//42.12;              //Dutycycle (38/255) = 15,06%, kan verhoogd worden als er meer apparatuur op het RC car platform geplaatst wordt, 42.12
 float GewensteDutyCycleServo = 35;            //Dutycycle voor de stuurservo in de rechtuitstand
 volatile long RcBediening_startPulse;         //Bevat de waarde van micros() op het moment dat een stijgende flank op de interrupt wordt gezien
 volatile unsigned int pulse_val;              //Bevat de tijdON van de PWM uitgestuurd door de RC zender
@@ -86,8 +86,8 @@ void setup() {
 
 ///RC control///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   InitTimersSafe();                                                   //Nodig om timers hun frequentie aan te passen (buiten timer 0, deze gebruikt Arduino onder meer voor de millis() functie
-  pinMode(3, INPUT);                                                  //Op pin 3 zit onze interrupt voor besturing over te nemen via de RC zender
-  attachInterrupt(1, rc_begin, RISING);                               //De interrupt moet initieel kijken naar een stijgende flank, als deze gezien wordt gaan we naar de ISR (interrupt service routine)
+  pinMode(2, INPUT);                                                  //Op pin 2 zit onze interrupt voor besturing over te nemen via de RC zender
+  attachInterrupt(digitalPinToInterrupt(2), rc_begin, RISING);                               //De interrupt moet initieel kijken naar een stijgende flank, als deze gezien wordt gaan we naar de ISR (interrupt service routine)
   SetPinFrequencySafe(motor, frequency);                              //De juiste pinnen voorzien van de juiste frequentie voor het PWM signaal
   SetPinFrequencySafe(servoMotor, frequency);
 }
@@ -95,7 +95,37 @@ void setup() {
 ///Main loop/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop(){
+tCAN Ontvangen;
+if (mcp2515_check_message()) 
+  {
+    if (mcp2515_get_message(&Ontvangen)) 
+        {
+        if(Ontvangen.id == 0xA1)                                                  //ID bericht dat UWBdata bevat
+                {
+               X_Huidig = (Ontvangen.data[0] + (Ontvangen.data[1]*256)+(Ontvangen.data[2]*65536)+(Ontvangen.data[3]*16777216));             //De data is opgeslaan volgens Intel Byte Order d.w.z. LSB eerst!
+               Y_Huidig = (Ontvangen.data[4] + (Ontvangen.data[5]*256)+(Ontvangen.data[6]*65536)+(Ontvangen.data[7]*16777216));
+               Serial.print("X huidig: ");                 
+               Serial.println(X_Huidig);
+               Serial.print("Y huidig: ");                 
+               Serial.println(Y_Huidig);
+                }
+         else if(Ontvangen.id == 0xB1)                                                  //ID bericht dat rotatiedata bevat
+                {
+               RotatieData = (Ontvangen.data[0] + (Ontvangen.data[1]*256));             //De data is opgeslaan volgens Intel Byte Order d.w.z. LSB eerst!
+               Serial.print("Rotatiedata: ");                 
+               Serial.println(RotatieData);
+                }
+         else if(Ontvangen.id == 0xC1)                                                  //ID bericht dat encoderdata bevat
+                {
+               EncoderData = (Ontvangen.data[0] + (Ontvangen.data[1]*256)+(Ontvangen.data[2]*65536)+(Ontvangen.data[3]*16777216));             //De data is opgeslaan volgens Intel Byte Order d.w.z. LSB eerst!
+               Serial.print("Encoderdata: ");                 
+               Serial.println(EncoderData);
+                }
+        }
+        }
+  
 
+ 
 ///RCcontrol//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (pulse_val > 600 && pulse_val <2400)                           //Als pulse_val een waarde hiertussen bevat wil dat zeggen dat de RC zender aanstaat m.a.w.
   {                                                                 //dat de zender op channel 3 van de RC ontvanger een PWM plaatst.
@@ -107,7 +137,8 @@ void loop(){
   }                                                                 
   else
   {
-  CanBusData();                                                     //Volgende data wordt van de CAN bus gehaald: UWB, rotatiedata (BNO055) en encoderdata
+  //CanBusData();                                                     //Volgende data wordt van de CAN bus gehaald: UWB, rotatiedata (BNO055) en encoderdata
   NavSof();                                                         //Bevat het waypoint navigatie algoritme
+  Debugging();
   }
 }

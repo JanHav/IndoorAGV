@@ -61,9 +61,12 @@ XasYas wps[] =
 #if 1 //Welke waypoint lijst we gebruiken hangt af van welke ik aan zet met de #if 1 
 XasYas wps[] = 
 {                
-1.00,2.00,
-3.00,3.00,
-5.00,1.00,
+5382,2840,
+5252,5691,
+4991,8336,
+3398,8392,
+3489,5750,
+3529,3072,
 };
 #endif
 

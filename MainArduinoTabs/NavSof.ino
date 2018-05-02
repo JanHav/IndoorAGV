@@ -23,18 +23,21 @@ void NavSof()
                                             //nu is het de bedoeling dat xstart_wp en ystart_wp steeds verwijzen naar het laatste eindwaypoint, 
                                             //zodat de trackline correct kan berekend worden
   }
-
+/*
 ///InitialisatieRoutine
 if (OpStart_lock == 0)
 {
-  UWB_lock = 0;
+  UWB_lock = 1;
   if (Encoder_lock == 0)
   {
     beginEncoder = EncoderData;
     Encoder_lock = 1;
   }
-  else if (30 >= abs(EncoderData - beginEncoder))
+  else if (300 >= ((125 * abs(EncoderData - beginEncoder))+125))
   {
+    //Serial.print("Initialisatie: ");
+    //Serial.println(abs(EncoderData - beginEncoder));
+    
     VooruitRijden();
   }
   else 
@@ -44,14 +47,14 @@ if (OpStart_lock == 0)
     OpStart_lock = 1;
   }
 }
-
+*/
 //Ervoor zorgen dat de AGV steeds weet of deze links of rechts van de trackline is
 HoekTrack = atan2(ystart_wp - wps[current_wp].Yas, xstart_wp - wps[current_wp].Xas)*57.29577951;
 HoekAGV = atan2(yhuidig_wp - wps[current_wp].Yas, xhuidig_wp - wps[current_wp].Xas)*57.29577951;
 
 //Pas als de initialisatie van de AGV afgelopen is mag onderstaande code uitgevoerd worden
-if (OpStart_lock == 1)
-{
+//if (OpStart_lock == 1)
+//{
   if (HoekTrack < HoekAGV)
   {
     if (BNO_lock ==0)
@@ -102,7 +105,7 @@ if (OpStart_lock == 1)
     Encoder_lock = 1;
   }
 
-  if (AfstandTotWaypoint > abs(EncoderData - beginEncoder))
+  if (AfstandTotWaypoint > ((125 * abs(EncoderData - beginEncoder))+125))
   {
     VooruitRijden();
   }
@@ -120,7 +123,7 @@ if (OpStart_lock == 1)
     current_wp = 0;  
     }
   }
-}
+//}
   
 }
 
