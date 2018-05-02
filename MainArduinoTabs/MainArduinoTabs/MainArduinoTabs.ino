@@ -83,13 +83,6 @@ void setup() {
     
 ///NavSof////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   waypoints = sizeof(wps) / sizeof(XasYas);                                   //Berekenen van het aantal waypoints in onze huidige array
-
-///RC control///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  InitTimersSafe();                                                   //Nodig om timers hun frequentie aan te passen (buiten timer 0, deze gebruikt Arduino onder meer voor de millis() functie
-  pinMode(3, INPUT);                                                  //Op pin 3 zit onze interrupt voor besturing over te nemen via de RC zender
-  attachInterrupt(1, rc_begin, RISING);                               //De interrupt moet initieel kijken naar een stijgende flank, als deze gezien wordt gaan we naar de ISR (interrupt service routine)
-  SetPinFrequencySafe(motor, frequency);                              //De juiste pinnen voorzien van de juiste frequentie voor het PWM signaal
-  SetPinFrequencySafe(servoMotor, frequency);
 }
 
 ///Main loop/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
