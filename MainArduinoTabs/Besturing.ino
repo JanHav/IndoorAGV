@@ -11,12 +11,13 @@ geen
 void VooruitRijden()
 {
   pinMode(motor,OUTPUT);
+  /*
   currentMillis = millis();
    if (currentMillis-previousMillis>=1 && GewensteDutyCycle > 42.01)     //Met deze waarden kan je spelen als de belasting op de RC car stijgt of je hem trager/ sneller wilt laten rijden 42.01
     {
       GewensteDutyCycle = GewensteDutyCycle-0.01;
       previousMillis = millis();
-    }
+    }*/
   pwmWrite(motor, GewensteDutyCycle);                                   //De motor aansturen met de gewenste dutycycle 
 }
 

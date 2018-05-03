@@ -31,12 +31,13 @@ byte xyStart_lock = 0;
 byte OpStart_lock = 0;
 byte Encoder_lock = 0;
 byte BNO_lock = 0;
+byte EncoderOpstart = 0;
 
 ///RCcontrol//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int motor = 3;                                //Pin 9 UNO voor PWM aandrijfmotor (aandrijving)
 int servoMotor = 9;                          //Pin 10 UNO voor PWM servomotor (sturen)
 int32_t frequency = 100;                      //Frequentie (in Hz, we willen een PWM met een frequentie van 100 Hz
-float GewensteDutyCycle = 42.4;//42.12;              //Dutycycle (38/255) = 15,06%, kan verhoogd worden als er meer apparatuur op het RC car platform geplaatst wordt, 42.12
+float GewensteDutyCycle = 43;              //Dutycycle (38/255) = 15,06%, kan verhoogd worden als er meer apparatuur op het RC car platform geplaatst wordt, 42.12
 float GewensteDutyCycleServo = 35;            //Dutycycle voor de stuurservo in de rechtuitstand
 volatile long RcBediening_startPulse;         //Bevat de waarde van micros() op het moment dat een stijgende flank op de interrupt wordt gezien
 volatile unsigned int pulse_val;              //Bevat de tijdON van de PWM uitgestuurd door de RC zender

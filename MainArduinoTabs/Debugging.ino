@@ -12,6 +12,12 @@ void Debugging()
   Serial.println(GewensteDutyCycle);
   Serial.print("GewensteDutyCycleServo: ");
   Serial.println(GewensteDutyCycleServo);
+  Serial.print("Encoderdata ");
+  Serial.println(EncoderData);
+  Serial.print("BeginEncoder ");
+  Serial.println(beginEncoder);
+  Serial.print("EncoderOpstart");
+  Serial.println(EncoderOpstart);
   Serial.print("EncoderafstandIni: ");
   Serial.println(((125 * abs(EncoderData - beginEncoder))+125));
   Serial.print("HoekTrack: ");

@@ -6,55 +6,73 @@ Return: /
 
 void NavSof()
 {
-  
-  if (UWB_lock == 0)                          //UWB update locatie enkel als dit gewenst is 
-  {                                           //d.w.z. als de flag op 0 staat
-    yhuidig_wp = Y_Huidig;
-    xhuidig_wp = X_Huidig;
-    UWB_lock = 1;
-  }
-  
+   
   if (xyStart_lock == 0x00)                  //Ervoor zorgen dat de eerste trackline berekend kan worden door het startwaypoint te voorzien van de huidige locatie
   {
-    xstart_wp = xhuidig_wp;                  //Het allereerste punt kunnen we niet opslaan in een array omdat deze bepaald wordt door de plaats waar de AGV wordt neergezet
-    ystart_wp = yhuidig_wp;                 //daarom bevat xstart en ystart initieel de waarde van xhuidig en yhuidig
+    xstart_wp = X_Huidig;                  //Het allereerste punt kunnen we niet opslaan in een array omdat deze bepaald wordt door de plaats waar de AGV wordt neergezet
+    ystart_wp = Y_Huidig;                 //daarom bevat xstart en ystart initieel de waarde van xhuidig en yhuidig
     xyStart_lock = 0x01;                    //Nadat de xstart_wp en ystart_wp zijn upgedatet met de huidige locatie, 
                                             //mag dit vervolgens niet meer zo gebeuren,daarom dat we ons lock resetten
                                             //nu is het de bedoeling dat xstart_wp en ystart_wp steeds verwijzen naar het laatste eindwaypoint, 
                                             //zodat de trackline correct kan berekend worden
   }
-/*
+
 ///InitialisatieRoutine
 if (OpStart_lock == 0)
 {
-  UWB_lock = 1;
   if (Encoder_lock == 0)
   {
     beginEncoder = EncoderData;
     Encoder_lock = 1;
   }
-  else if (300 >= ((125 * abs(EncoderData - beginEncoder))+125))
+  
+  do
   {
-    //Serial.print("Initialisatie: ");
-    //Serial.println(abs(EncoderData - beginEncoder));
-    
-    VooruitRijden();
+    tCAN Ontvangen;
+    if (mcp2515_check_message()) 
+      {
+        if (mcp2515_get_message(&Ontvangen)) 
+            {
+            if(Ontvangen.id == 0xC1)                                                  //ID bericht dat encoderdata bevat
+                {
+               EncoderData = (Ontvangen.data[0] + (Ontvangen.data[1]*256)+(Ontvangen.data[2]*65536)+(Ontvangen.data[3]*16777216));             //De data is opgeslaan volgens Intel Byte Order d.w.z. LSB eerst!
+               Serial.print("Encoderdata: ");                 
+               Serial.println(EncoderData);
+                }
+            }
+            }
+    if (300 >= ((125 * abs(EncoderData - beginEncoder))+125))
+    {
+      EncoderOpstart = 0;
+      VooruitRijden();
+      Serial.print("Voor1");
+    }
+    else
+    {
+      EncoderOpstart = 1;
+      Stoppen();
+      Encoder_lock = 0;
+      OpStart_lock = 1;
+    }
   }
-  else 
-  {
-    Stoppen();
-    Encoder_lock = 0;
-    OpStart_lock = 1;
-  }
+   while(EncoderOpstart = 0); 
 }
-*/
+/*
+///Na de initialisatieroutine komen we hierin terecht
+ if (UWB_lock == 0)                          //UWB update locatie enkel als dit gewenst is 
+  {                                           //d.w.z. als de flag op 0 staat
+    yhuidig_wp = Y_Huidig;
+    xhuidig_wp = X_Huidig;
+    UWB_lock = 1;
+  }
+
 //Ervoor zorgen dat de AGV steeds weet of deze links of rechts van de trackline is
 HoekTrack = atan2(ystart_wp - wps[current_wp].Yas, xstart_wp - wps[current_wp].Xas)*57.29577951;
 HoekAGV = atan2(yhuidig_wp - wps[current_wp].Yas, xhuidig_wp - wps[current_wp].Xas)*57.29577951;
 
 //Pas als de initialisatie van de AGV afgelopen is mag onderstaande code uitgevoerd worden
-//if (OpStart_lock == 1)
-//{
+if (OpStart_lock == 1)
+{
   if (HoekTrack < HoekAGV)
   {
     if (BNO_lock ==0)
@@ -123,7 +141,7 @@ HoekAGV = atan2(yhuidig_wp - wps[current_wp].Yas, xhuidig_wp - wps[current_wp].X
     current_wp = 0;  
     }
   }
-//}
+}*/
   
 }
 
